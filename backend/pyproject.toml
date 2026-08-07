@@ -1,0 +1,18 @@
+[project]
+name = "17-1st-teamproject"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.14"
+dependencies = [
+    "fastapi>=0.140.7",
+    "geopandas>=1.1.4",
+    "jinja2>=3.1.6",
+    "numpy>=2.5.1",
+    "openpyxl>=3.1.5",
+    "pandas>=3.0.5",
+    "pyproj>=3.7.2",
+    "python-dotenv>=1.2.2",
+    "shapely>=2.1.2",
+    "uvicorn>=0.51.0",
+]
