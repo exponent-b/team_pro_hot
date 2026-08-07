@@ -3631,7 +3631,8 @@
       return;
     }
 
-    if (candidates.length === 1) {
+    if (candidates.length > 0) {
+      // 0807 jisu_15
       const candidate = candidates[0];
       searchInput.value = candidate.keyword;
       closeSearchResults();
@@ -3877,25 +3878,82 @@
 
   searchButton?.addEventListener("click", searchDong);
 
-  searchInput?.addEventListener("keydown", (event) => {
+  // 0807 / jisu_15 / 검색창 화살표 이동 시 자동완성 재렌더링 방지-------------------
+  searchInput?.addEventListener("keydown", async (event) => {
     if (event.key === "Enter") {
       event.preventDefault();
+      event.stopImmediatePropagation();
       searchDong();
-    } else if (event.key === "ArrowDown" && !searchResults?.hidden) {
+      return;
+    }
+
+    if (event.key === "ArrowDown") {
       event.preventDefault();
-      searchResults.querySelector("button")?.focus();
+      event.stopImmediatePropagation();
+
+      // 입력 직후 남아 있는 250ms 자동완성 타이머를 취소한다.
+      if (searchRenderTimer !== null) {
+        window.clearTimeout(searchRenderTimer);
+        searchRenderTimer = null;
+      }
+
+      // 현재 검색어 기준으로 목록을 완성한 뒤 첫 항목에 포커스를 준다.
+      await renderSearchResults();
+
+      searchResults?.querySelector(".dong-search-result-button")?.focus();
     }
   });
+  // 15-----------------------------------------------------------------
 
+  // 0807 jisu_15 목록 이벤트 교체
   searchResults?.addEventListener("keydown", (event) => {
+    // 0807 / jisu_15 / 검색 결과 이동 중 다시 입력하면 검색창으로 복귀-------------------
+    if (
+      event.key.length === 1 &&
+      !event.ctrlKey &&
+      !event.metaKey &&
+      !event.altKey
+    ) {
+      event.preventDefault();
+      event.stopImmediatePropagation();
+
+      // 누른 글자를 검색창에 이어서 입력한다.
+      searchInput?.focus();
+      searchInput.value += event.key;
+      searchInput.dispatchEvent(new Event("input", { bubbles: true }));
+      return;
+    }
+
+    // 한글 입력 시작 시 검색창으로 포커스를 되돌린다.
+    if (event.key === "Process") {
+      event.stopImmediatePropagation();
+      searchInput?.focus();
+      return;
+    }
+
+    // Backspace도 검색창에서 처리한다.
+    if (event.key === "Backspace") {
+      event.preventDefault();
+      event.stopImmediatePropagation();
+
+      searchInput?.focus();
+      searchInput.value = searchInput.value.slice(0, -1);
+      searchInput.dispatchEvent(new Event("input", { bubbles: true }));
+      return;
+    }
+    // 15-----------------------------------------------------------------
     const resultButtons = [...searchResults.querySelectorAll("button")];
     const currentIndex = resultButtons.indexOf(document.activeElement);
 
     if (event.key === "ArrowDown") {
       event.preventDefault();
+      event.stopImmediatePropagation();
+
       resultButtons[(currentIndex + 1) % resultButtons.length]?.focus();
     } else if (event.key === "ArrowUp") {
       event.preventDefault();
+      event.stopImmediatePropagation();
+
       if (currentIndex <= 0) {
         searchInput?.focus();
       } else {
@@ -3903,12 +3961,12 @@
       }
     } else if (event.key === "Escape") {
       event.preventDefault();
-      event.stopPropagation();
+      event.stopImmediatePropagation();
+
       closeSearchResults();
       searchInput?.focus();
     }
   });
-
   document.addEventListener("click", (event) => {
     if (!event.target.closest(".search-autocomplete-container")) {
       closeSearchResults();
