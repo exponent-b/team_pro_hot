@@ -329,10 +329,11 @@
   // 태경 commit merge 26-08-06 17-35 / 기존 실시간 점수 API를 유지한다.
   const HEAT_DATA_URL = "/api/realtime-heat-risk";
 
+  // 0807 서현_색상 수정
   const RISK_STYLES = {
     low: { label: "낮음", color: "#ffedc7" },
-    moderate: { label: "보통", color: "#ffa6a6" },
-    high: { label: "높음", color: "#ff7070" },
+    moderate: { label: "보통", color: "#ffc7a6" },
+    high: { label: "높음", color: "#ff8d70" },
     critical: { label: "매우 높음", color: "#e73f3f" },
     none: { label: "데이터 없음", color: "#e2e8f0" },
   };
@@ -685,7 +686,8 @@
       // jisu_02_추가수정 / fillColor, fillOpacity 수정
       // 색상을 꺼도 마우스를 올린 행정동은 흰색 반투명 효과와 파란 테두리로 구분
       fillColor: vulnerabilityLayerVisible ? riskStyle.color : "#ffffff",
-      fillOpacity: vulnerabilityLayerVisible ? (heatData ? 0.94 : 0.5) : 0.16,
+      // 0807 서현_투명도 내림
+      fillOpacity: vulnerabilityLayerVisible ? (heatData ? 0.72 : 0.5) : 0.16,
       //
       strokeColor: "#1e3a8a",
       strokeOpacity: 1,
@@ -1011,18 +1013,20 @@
 
       polygonGroups.forEach((polygonCoordinates) => {
         const polygon = new naver.maps.Polygon({
+          /* 0807 서현_ 맵 테두리 수정 (1013-1022줄 그냥 싹 복붙하는거 추천) */
           map,
           paths: polygonCoordinatesToPaths(polygonCoordinates),
 
-          fillColor: "#e2e8f0",
-          fillOpacity: 0.92,
-
-          strokeColor: "#e2e8f0",
-          strokeOpacity: 0,
-          strokeWeight: 0,
+          fillColor: "#000000",
+          fillOpacity: 0,
+          strokeColor: "#374659",
+          strokeOpacity: 0.8,
+          strokeWeight: 2.2,
+          strokeLineCap: "round",
+          strokeLineJoin: "round",
 
           clickable: false,
-          zIndex: 10,
+          zIndex: 30,
         });
 
         maskPolygons.push(polygon);
@@ -1093,7 +1097,8 @@
 
       fillColor: riskStyle.color,
       // jisu_02_추가수정 / 수정 fillOpacity:
-      fillOpacity: vulnerabilityLayerVisible ? (heatData ? 0.72 : 0.28) : 0,
+      // 0806 서현_오퍼시티 올림
+      fillOpacity: vulnerabilityLayerVisible ? (heatData ? 0.85 : 0.28) : 0,
       //
       strokeColor: "#64748b",
       strokeOpacity: administrativeBoundaryVisible ? 0.8 : 0,
@@ -2439,18 +2444,19 @@
         key: "public",
         label: "모두 이용 가능",
         count: 0,
-        color: "#10b981",
+        // 0807 서현_색상 코드 변경
+        color: "#2ed3b2",
         facilityTypes: new Map(),
       },
       restricted: {
         key: "restricted",
         label: "특정 대상 중심",
         count: 0,
-        color: "#f97316",
+        // 0807 서현_색상 코드 변경
+        color: "#fac05c",
         facilityTypes: new Map(),
       },
     };
-
     shelters.forEach((shelter) => {
       const accessType = normalizeShelterAccessType(shelter);
       const group = summary[accessType];
@@ -4040,21 +4046,22 @@
   riskRankingList?.addEventListener("click", handleRankingClick);
   lowRiskRankingList?.addEventListener("click", handleRankingClick);
 
-  boundaryToggle?.addEventListener("change", () => {
-    administrativeBoundaryVisible = boundaryToggle.checked;
-    applyAllDongPolygonStyles();
+  // 0807 서현_행정동 경계 표시 주석 처리(!!!삭제하면 오류!!!)
+  // boundaryToggle?.addEventListener("change", () => {
+  //   administrativeBoundaryVisible = boundaryToggle.checked;
+  //   applyAllDongPolygonStyles();
 
-    if (selectedFeature) {
-      showSelectionEffects(selectedFeature);
-      applySelectedFeatureStyle(selectedFeature);
-    }
+  //   if (selectedFeature) {
+  //     showSelectionEffects(selectedFeature);
+  //     applySelectedFeatureStyle(selectedFeature);
+  //   }
 
-    setStatus(
-      administrativeBoundaryVisible
-        ? "행정동 경계를 표시합니다."
-        : "행정동 경계를 숨겼습니다.",
-    );
-  });
+  //   setStatus(
+  //     administrativeBoundaryVisible
+  //       ? "행정동 경계를 표시합니다."
+  //       : "행정동 경계를 숨겼습니다.",
+  //   );
+  // });
 
   // jisu_02_추가 / 체크박스 이벤트 추가
   vulnerabilityToggle?.addEventListener("change", () => {
@@ -4104,11 +4111,14 @@
         polygon.setMap(map);
       }
 
+      /* 0807 서현_ 맵 테두리 수정 */
       polygon.setOptions({
         fillOpacity: 0,
-        strokeColor: "#0f172a",
-        strokeOpacity: 1,
-        strokeWeight: 5,
+        strokeColor: "#374659",
+        strokeOpacity: 0.8,
+        strokeWeight: 2.2,
+        strokeLineCap: "round",
+        strokeLineJoin: "round",
         zIndex: 30,
       });
     });
