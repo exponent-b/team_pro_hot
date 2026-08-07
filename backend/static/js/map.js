@@ -3367,6 +3367,11 @@
     closeRegionPopup();
     hideSelectedHeatAlert();
     clearSelectionEffects();
+    // 0807 / jisu_15 / 지도 초기화 시 메인 쉼터 표시도 함께 초기화-------------------
+    closeRegionChoicePanel();
+    clearMainMapShelterMarkers();
+    showRankingSidebar();
+    // 15-----------------------------------------------------------------
 
     if (selectedFeature) {
       applyDongPolygonStyle(selectedFeature);
